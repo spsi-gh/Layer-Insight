@@ -1,0 +1,25 @@
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                           forward_pass         0.00%       0.000us         0.00%       0.000us       0.000us       5.146ms        81.38%       5.146ms       1.715ms             3  
+                                          ProfilerStep*         3.79%     210.000us        18.13%       1.004ms     334.667us       0.000us         0.00%       5.129ms       1.710ms             3  
+                                           forward_pass         4.92%     272.200us        14.34%     794.000us     264.667us       0.000us         0.00%       5.129ms       1.710ms             3  
+                                           aten::linear         0.51%      28.500us         7.88%     436.400us      72.733us       0.000us         0.00%       4.644ms     774.005us             6  
+                                            aten::addmm         3.62%     200.300us         6.19%     342.700us      57.117us       4.644ms        73.44%       4.644ms     774.005us             6  
+ampere_bf16_s1688gemm_bf16_128x128_ldg8_relu_f2f_sta...         0.00%       0.000us         0.00%       0.000us       0.000us       3.426ms        54.17%       3.426ms     856.428us             4  
+_ZN7cutlass7Kernel2I68cutlass_80_tensorop_bf16_s1681...         0.00%       0.000us         0.00%       0.000us       0.000us       2.411ms        38.13%       2.411ms     803.691us             3  
+                                             aten::gelu         0.88%      48.500us         1.54%      85.400us      28.467us     485.350us         7.67%     485.350us     161.783us             3  
+_ZN2at6native29vectorized_elementwise_kernelILi4EZZZ...         0.00%       0.000us         0.00%       0.000us       0.000us     485.350us         7.67%     485.350us     161.783us             3  
+                                        Memset (Device)         0.00%       0.000us         0.00%       0.000us       0.000us       1.728us         0.03%       1.728us       0.432us             4  
+                                                aten::t         0.52%      28.600us         1.18%      65.200us      10.867us       0.000us         0.00%       0.000us       0.000us             6  
+                                        aten::transpose         0.44%      24.400us         0.66%      36.600us       6.100us       0.000us         0.00%       0.000us       0.000us             6  
+                                       aten::as_strided         0.22%      12.200us         0.22%      12.200us       2.033us       0.000us         0.00%       0.000us       0.000us             6  
+                                 cudaDeviceGetAttribute         0.05%       2.900us         0.05%       2.900us       0.967us       0.000us         0.00%       0.000us       0.000us             3  
+                                        cudaMemsetAsync         0.60%      33.400us         0.60%      33.400us       5.567us       0.000us         0.00%       0.000us       0.000us             6  
+                                         cuLaunchKernel         1.44%      79.700us         1.44%      79.700us      26.567us       0.000us         0.00%       0.000us       0.000us             3  
+                                       cudaLaunchKernel         1.09%      60.100us         1.09%      60.100us      10.017us       0.000us         0.00%       0.000us       0.000us             6  
+          cudaOccupancyMaxActiveBlocksPerMultiprocessor         0.06%       3.200us         0.06%       3.200us       1.067us       0.000us         0.00%       0.000us       0.000us             3  
+                                  cudaDeviceSynchronize        81.87%       4.534ms        81.87%       4.534ms       4.534ms       0.000us         0.00%       0.000us       0.000us             1  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 5.537ms
+Self CUDA time total: 6.324ms

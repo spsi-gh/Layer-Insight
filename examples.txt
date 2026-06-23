@@ -1,0 +1,16 @@
+python profiler.py \
+    --model models.mlp
+
+python profiler.py \
+    --model models.mlp \
+    --compile
+
+python profiler.py \
+    --model models.mlp \
+    --dtype bf16 \
+    --warmup
+
+python profiler.py \
+    --model models.mlp \
+    --batch-size 4096
+
