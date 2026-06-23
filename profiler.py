@@ -1,9 +1,10 @@
 import argparse
 import importlib
 import os
-
+import json
+import platform
+from datetime import datetime
 import torch
-
 
 def parse_arguments():
     p = argparse.ArgumentParser()
@@ -17,7 +18,7 @@ def parse_arguments():
     p.add_argument(
         "--batch-size",
         type=int,
-        default=1024
+        default=8
     )
 
     p.add_argument(
@@ -52,6 +53,16 @@ def parse_arguments():
     default=None
     )
 
+    p.add_argument(
+    "--tv-model",
+    default=None
+    )
+
+    p.add_argument(
+        "--timm-model",
+        default=None
+    )
+
     return p.parse_args()
 
 
@@ -69,6 +80,17 @@ def main():
     module = load_model_module(args.model)
 
     model = module.load_model(args).to(device=device, dtype=dtype)
+
+    total_params = sum(
+    p.numel()
+    for p in model.parameters()
+    )
+
+    trainable_params = sum(
+        p.numel()
+        for p in model.parameters()
+        if p.requires_grad
+    )
 
     if args.compile:
         model = torch.compile(model)
@@ -99,27 +121,37 @@ def main():
 
     os.makedirs(args.trace_dir, exist_ok=True)
 
-    model_name = args.model.split(".")[-1]
+    run_id = datetime.now().strftime(
+    "%Y%m%d_%H%M%S"
+    )
 
-    compile_tag = "compile" if args.compile else "eager"
-    warmup_tag = "warm" if args.warmup else "cold"
+    run_dir = os.path.join(
+        args.trace_dir,
+        run_id
+    )
 
-    tag = (
-        f"{model_name}"
-        f"_bs{args.batch_size}"
-        f"_{args.dtype}"
-        f"_{warmup_tag}"
-        f"_{compile_tag}"
+    os.makedirs(run_dir, exist_ok=True)
+
+    model_name = (
+    args.hf_model
+    or args.tv_model
+    or args.timm_model
+    or args.model.split(".")[-1]
     )
 
     trace_path = os.path.join(
-        args.trace_dir,
-        f"{tag}.json"
+        run_dir,
+        "trace.json"
     )
 
     table_path = os.path.join(
-        args.trace_dir,
-        f"{tag}.txt"
+        run_dir,
+        "summary.txt"
+    )
+
+    metadata_path = os.path.join(
+        run_dir,
+        "metadata.json"
     )
 
     schedule = torch.profiler.schedule(
@@ -161,6 +193,36 @@ def main():
         f.write(table)
 
     print(f"Saving table: {table_path}")
+
+    metadata = {
+    "model": {
+        "adapter": args.model,
+        "name": model_name,
+        "parameters": total_params,
+        "trainable_parameters": trainable_params
+        },
+
+    "runtime": (
+        module.get_runtime_metadata(args)
+        ),
+
+    "hardware": {
+        "platform": platform.system(),
+        "device": str(device),
+        "cuda_available": torch.cuda.is_available(),
+        "cuda_version": torch.version.cuda
+        }
+    }
+
+    if torch.cuda.is_available():
+        metadata["hardware"]["gpu"] = (
+            torch.cuda.get_device_name(0)
+        )
+
+    with open(metadata_path, "w") as f:
+        json.dump(metadata, f, indent=4)
+
+    print(f"Saving metadata: {metadata_path}")
 
 
 if __name__ == "__main__":

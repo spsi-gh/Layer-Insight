@@ -16,7 +16,7 @@ class SimpleMLP(nn.Module):
         return self.net(x)
 
 
-def load_model():
+def load_model(args):
     return SimpleMLP()
 
 
